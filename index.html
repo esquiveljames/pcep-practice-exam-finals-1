@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Basic page settings: text encoding and mobile-friendly sizing -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PCEP Practice Exam · AUF CCS</title>
+  <meta name="description" content="PCEP-30-02 style practice examination for AUF College of Computer Studies students.">
+  <!-- Tell search engines not to list this practice exam -->
+  <meta name="robots" content="noindex">
+
+  <!-- Fonts (same family as the PCEP study handout) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+
+  <!-- All visual styling lives in one stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= HEADER BAR (always visible) ================= -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">AUF</div>
+      <div>
+        <div class="brand-line" id="brandInstitution">Angeles University Foundation</div>
+        <div class="brand-title" id="brandTitle">PCEP Practice Examination</div>
+      </div>
+    </div>
+    <!-- Exam-only status: student, attempt and timer (hidden until exam starts) -->
+    <div class="exam-status" id="examStatus" hidden>
+      <div class="who"><span id="statusName"></span><small id="statusAttempt"></small></div>
+      <div class="timer" id="timer" role="timer" aria-live="off" aria-label="Time remaining">
+        <span class="timer-label">Time left</span>
+        <span class="timer-value" id="timerValue">40:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="app">
+
+  <!-- ================= SCREEN 1: WELCOME + STUDENT FORM ================= -->
+  <section class="screen" id="screenWelcome">
+    <div class="welcome-grid">
+      <div class="card instructions">
+        <p class="eyebrow" id="welcomeDept">College of Computer Studies</p>
+        <h1 id="welcomeTitle">PCEP-30-02 Practice Examination</h1>
+        <p class="lead">A timed practice test modeled on the Python Institute's PCEP™ Certified Entry-Level Python Programmer exam.</p>
+
+        <!-- Key facts filled in from config.js -->
+        <dl class="facts">
+          <div><dt>Items</dt><dd id="factItems">30</dd></div>
+          <div><dt>Time limit</dt><dd id="factTime">40 min</dd></div>
+          <div><dt>Passing score</dt><dd id="factPass">70%</dd></div>
+          <div><dt>Attempts</dt><dd id="factAttempts">2</dd></div>
+        </dl>
+
+        <h2>Before you begin</h2>
+        <ol class="rules">
+          <li>Every item is multiple choice with <b>one</b> correct answer. Unanswered items are marked wrong, so answer everything.</li>
+          <li>The timer starts when you press <b>Start Attempt</b> and keeps running even if you close or refresh the page.</li>
+          <li>Starting an attempt <b>uses</b> it, even if you leave before submitting. Your unfinished attempt resumes when you return.</li>
+          <li>Use <b>Previous</b>, <b>Next</b> or the question palette to move around. You can flag items to come back to.</li>
+          <li>When time runs out, your exam is submitted automatically.</li>
+          <li>Correct answers and explanations appear only after you submit.</li>
+        </ol>
+        <p class="byline">Prepared by <span id="welcomeInstructor">Dr. James A. Esquivel</span></p>
+      </div>
+
+      <!-- Student information form -->
+      <form class="card form-card" id="studentForm" novalidate>
+        <h2>Student information</h2>
+        <p class="muted small">Only your name and student number are collected, to count your attempts and record your result.</p>
+
+        <label for="inName">Full name</label>
+        <input id="inName" name="name" type="text" autocomplete="name" maxlength="80" required placeholder="Juan Dela Cruz">
+        <p class="field-error" id="errName" hidden></p>
+
+        <label for="inNumber">Student number</label>
+        <input id="inNumber" name="number" type="text" autocomplete="off" maxlength="20" required inputmode="text">
+        <p class="field-error" id="errNumber" hidden></p>
+
+        <label class="check">
+          <input type="checkbox" id="inAgree" required>
+          <span>I will answer this exam on my own, without notes, code editors or other help.</span>
+        </label>
+        <p class="field-error" id="errAgree" hidden></p>
+
+        <button class="btn btn-primary btn-block" type="submit" id="btnContinue">Continue</button>
+        <p class="notice" id="storageNotice" hidden></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 2: ATTEMPT LOBBY ================= -->
+  <section class="screen" id="screenLobby" hidden>
+    <div class="card narrow">
+      <p class="eyebrow">Attempt status</p>
+      <h1 id="lobbyHeading">Welcome</h1>
+      <p id="lobbyMessage" class="lead"></p>
+
+      <!-- Previous results table (filled by exam.js) -->
+      <div id="historyBox" hidden>
+        <h2>Your completed attempts</h2>
+        <div class="table-wrap">
+          <table class="history">
+            <thead><tr><th>Attempt</th><th>Score</th><th>Percent</th><th>Status</th><th>Completed</th></tr></thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" type="button" id="btnLobbyBack">Back</button>
+        <button class="btn btn-primary" type="button" id="btnStart">Start Attempt</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 3: THE EXAM ================= -->
+  <section class="screen" id="screenExam" hidden>
+    <div class="exam-layout">
+      <!-- Left / main column: one question at a time -->
+      <div class="exam-main">
+        <div class="progress-row">
+          <span id="progressText">Question 1 of 30</span>
+          <span id="answeredText" class="muted">0 answered</span>
+        </div>
+        <div class="progress-bar" aria-hidden="true"><div id="progressFill"></div></div>
+
+        <article class="card question-card" id="questionCard" tabindex="-1">
+          <div class="q-head">
+            <span class="q-number" id="qNumber">Question 1</span>
+            <button type="button" class="flag-btn" id="btnFlag" aria-pressed="false">⚑ Flag for review</button>
+          </div>
+          <p class="q-prompt" id="qPrompt"></p>
+          <pre class="q-code" id="qCode" hidden><code></code></pre>
+          <fieldset class="options" id="qOptions">
+            <legend class="sr-only">Answer choices</legend>
+          </fieldset>
+        </article>
+
+        <div class="nav-row">
+          <button class="btn btn-ghost" type="button" id="btnPrev">‹ Previous</button>
+          <button class="btn btn-ghost palette-toggle" type="button" id="btnPalette" aria-controls="palettePanel" aria-expanded="false">Questions</button>
+          <button class="btn btn-primary" type="button" id="btnNext">Next ›</button>
+        </div>
+      </div>
+
+      <!-- Right column: question palette -->
+      <aside class="card palette" id="palettePanel" aria-label="Question palette">
+        <div class="palette-head">
+          <h2>Question palette</h2>
+          <button type="button" class="close-x" id="btnPaletteClose" aria-label="Close palette">×</button>
+        </div>
+        <div class="palette-grid" id="paletteGrid"></div>
+        <ul class="legend">
+          <li><span class="sw sw-answered"></span>Answered</li>
+          <li><span class="sw sw-unanswered"></span>Not answered</li>
+          <li><span class="sw sw-flagged"></span>Flagged</li>
+          <li><span class="sw sw-current"></span>Current</li>
+        </ul>
+        <button class="btn btn-submit btn-block" type="button" id="btnSubmit">Submit Examination</button>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 4: RESULTS ================= -->
+  <section class="screen" id="screenResults" hidden>
+    <div class="card narrow results-card">
+      <p class="eyebrow">Examination result</p>
+      <div class="verdict" id="verdict">
+        <div class="verdict-badge" id="verdictBadge">PASSED</div>
+        <div class="verdict-score"><span id="resPercent">0%</span><small>passing score <span id="resPassMark">70%</span></small></div>
+      </div>
+      <p class="muted" id="resAutoNote" hidden>Time ran out, so this attempt was submitted automatically.</p>
+
+      <dl class="facts result-facts">
+        <div><dt>Score</dt><dd id="resScore">0 / 30</dd></div>
+        <div><dt>Correct</dt><dd id="resCorrect">0</dd></div>
+        <div><dt>Incorrect</dt><dd id="resIncorrect">0</dd></div>
+        <div><dt>Unanswered</dt><dd id="resUnanswered">0</dd></div>
+        <div><dt>Time used</dt><dd id="resTime">0:00</dd></div>
+        <div><dt>Attempt</dt><dd id="resAttempt">1 of 2</dd></div>
+      </dl>
+
+      <h2>By syllabus section</h2>
+      <div class="sections" id="resSections"></div>
+
+      <p class="muted small" id="resMeta"></p>
+      <p class="notice" id="resSyncNote" hidden></p>
+
+      <div class="actions wrap">
+        <button class="btn btn-ghost" type="button" id="btnDownloadMine">Download my result (CSV)</button>
+        <button class="btn btn-ghost" type="button" id="btnPrint">Print</button>
+        <button class="btn btn-primary" type="button" id="btnNextAttempt" hidden>Start Attempt 2</button>
+        <button class="btn btn-ghost" type="button" id="btnFinish">Finish</button>
+      </div>
+    </div>
+
+    <!-- Answer review -->
+    <div class="review" id="reviewBox">
+      <div class="review-head">
+        <h2>Answer review</h2>
+        <div class="seg" role="group" aria-label="Filter review">
+          <button type="button" class="seg-btn is-on" data-filter="all">All</button>
+          <button type="button" class="seg-btn" data-filter="wrong">Incorrect &amp; unanswered</button>
+        </div>
+      </div>
+      <div id="reviewList"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span>Angeles University Foundation · College of Computer Studies</span>
+  <span>Practice exam only. PCEP™ is a trademark of the Python Institute; this site is not affiliated with it.</span>
+</footer>
+
+<!-- ================= POP-UP DIALOGS ================= -->
+<!-- Confirm before starting -->
+<dialog id="dlgStart" class="dialog">
+  <h2>Start attempt <span id="dlgStartNo">1</span>?</h2>
+  <p>The <span id="dlgStartMin">40</span>-minute timer starts immediately and this attempt is counted as used, even if you leave early.</p>
+  <div class="actions">
+    <button class="btn btn-ghost" value="cancel" type="button" id="dlgStartCancel">Not yet</button>
+    <button class="btn btn-primary" type="button" id="dlgStartOk">Start now</button>
+  </div>
+</dialog>
+
+<!-- Confirm before submitting -->
+<dialog id="dlgSubmit" class="dialog">
+  <h2>Submit your examination?</h2>
+  <p id="dlgSubmitSummary"></p>
+  <p class="warn" id="dlgSubmitWarn" hidden></p>
+  <p class="muted small">After you submit you cannot change any answer.</p>
+  <div class="actions">
+    <button class="btn btn-ghost" type="button" id="dlgSubmitCancel">Keep working</button>
+    <button class="btn btn-submit" type="button" id="dlgSubmitOk">Yes, submit</button>
+  </div>
+</dialog>
+
+<!-- Shown when time runs out -->
+<dialog id="dlgTimeUp" class="dialog">
+  <h2>Time is up</h2>
+  <p>Your examination has been submitted automatically with the answers you selected.</p>
+  <div class="actions">
+    <button class="btn btn-primary" type="button" id="dlgTimeUpOk">See my result</button>
+  </div>
+</dialog>
+
+<!-- Settings, then storage, then question data, then the app itself -->
+<script src="config.js"></script>
+<script src="storage.js"></script>
+<script src="questions.js"></script>
+<script src="exam.js"></script>
+</body>
+</html>

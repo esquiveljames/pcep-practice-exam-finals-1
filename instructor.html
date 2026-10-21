@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Instructor Results · PCEP Practice Exam</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">AUF</div>
+      <div>
+        <div class="brand-line">Instructor view</div>
+        <div class="brand-title">PCEP Practice Exam Results</div>
+      </div>
+    </div>
+    <a class="btn btn-ghost" href="index.html" style="text-decoration:none">Open exam</a>
+  </div>
+</header>
+
+<main class="inst">
+
+  <!-- ===== PIN gate ===== -->
+  <section class="card narrow" id="gate">
+    <h1>Instructor sign-in</h1>
+    <p class="muted">Enter the instructor PIN to view results stored in <b>this browser</b>.</p>
+    <form class="row" id="pinForm">
+      <label class="sr-only" for="pin">PIN</label>
+      <input type="password" id="pin" autocomplete="current-password" placeholder="Instructor PIN" required>
+      <button class="btn btn-primary" type="submit">View results</button>
+    </form>
+    <p class="field-error" id="pinError" hidden></p>
+    <p class="notice small">The PIN keeps students from casually opening this page. It is not strong security: anyone using this same browser could also clear its data.</p>
+  </section>
+
+  <!-- ===== Results (after PIN) ===== -->
+  <section id="panel" class="inst" hidden>
+
+    <div class="card" id="backendNote" hidden>
+      <h2>Central results are in your Google Sheet</h2>
+      <p class="muted">A backend URL is set in <code>config.js</code>, so every student's attempts and results are written to the Google Sheet behind it. This page shows only results saved in this browser plus any CSV files you import.</p>
+    </div>
+
+    <dl class="inst-stats">
+      <div><dt>Results</dt><dd id="stRows">0</dd></div>
+      <div><dt>Students</dt><dd id="stStudents">0</dd></div>
+      <div><dt>Passed</dt><dd id="stPassed">0</dd></div>
+      <div><dt>Average</dt><dd id="stAvg">0%</dd></div>
+    </dl>
+
+    <div class="card" style="display:grid;gap:12px">
+      <div class="inst-bar">
+        <h2>Completed attempts</h2>
+        <div class="row">
+          <label class="sr-only" for="search">Search</label>
+          <input type="search" id="search" placeholder="Search name or number">
+          <button class="btn btn-primary" type="button" id="btnExport">Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Student No.</th><th>Attempt</th><th>Score</th><th>%</th><th>Status</th><th>Auto</th><th>Time</th><th>Completed</th><th>Source</th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="muted small" id="emptyMsg">No results yet.</p>
+    </div>
+
+    <div class="card" style="display:grid;gap:10px">
+      <h2>Collect results from students' devices</h2>
+      <p>Without a backend, each result stays in the browser where the exam was taken. Ask students to press <b>Download my result (CSV)</b> after submitting and send you the file. Import all the files here to combine them into one list, then export.</p>
+      <div class="row">
+        <label class="btn btn-ghost" style="margin:0">
+          Import CSV files
+          <input type="file" id="importFiles" accept=".csv,text/csv" multiple hidden>
+        </label>
+        <button class="btn btn-ghost" type="button" id="btnClearImported">Remove imported results</button>
+      </div>
+      <p class="muted small" id="importMsg"></p>
+    </div>
+
+    <div class="card" style="display:grid;gap:10px">
+      <h2>Attempts on this device</h2>
+      <p class="muted">Useful on a shared lab computer. Resetting a student number removes its attempts <b>from this browser only</b>, which gives that student their attempts again here.</p>
+      <div class="row">
+        <label class="sr-only" for="resetNo">Student number</label>
+        <input type="text" id="resetNo" placeholder="Student number">
+        <button class="btn btn-danger" type="button" id="btnReset">Reset this student</button>
+        <button class="btn btn-danger" type="button" id="btnClearAll">Clear ALL exam data on this device</button>
+      </div>
+      <p class="muted small" id="resetMsg"></p>
+    </div>
+
+    <div class="card" style="display:grid;gap:10px">
+      <h2>Make a new PIN</h2>
+      <p class="muted">Type a new PIN (10 or more characters is best). Copy the code it produces into <code>instructorPinHash</code> in <code>config.js</code>, then upload that file.</p>
+      <div class="row">
+        <input type="text" id="newPin" placeholder="New PIN" autocomplete="off">
+        <button class="btn btn-ghost" type="button" id="btnHash">Make hash</button>
+      </div>
+      <div class="hash-out" id="hashOut" hidden></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>Angeles University Foundation · College of Computer Studies</span>
+  <span>Instructor tools</span>
+</footer>
+
+<script src="config.js"></script>
+<script src="storage.js"></script>
+<script src="instructor.js"></script>
+</body>
+</html>
